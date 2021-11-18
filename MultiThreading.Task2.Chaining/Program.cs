@@ -23,7 +23,7 @@ namespace MultiThreading.Task2.Chaining
             Console.WriteLine("Fourth Task – calculates the average value. All this tasks should print the values to console");
             Console.WriteLine();
 
-            Task.Run(() =>
+            var firstTask = Task.Run(() =>
             {
                 var array = new int[10];
                 var random = new Random();
@@ -31,27 +31,38 @@ namespace MultiThreading.Task2.Chaining
 
                 Console.WriteLine($"First Task - [{string.Join(", ", array)}]");
                 return array;
-            }).ContinueWith(antecedent => {
-                var array = antecedent.Result;
+            });
+            firstTask.Wait();
+
+            var secondTask = Task.Run(() =>
+            {
+                var array = firstTask.Result;
                 var rndInt = new Random().Next(0, 100);
                 ForAll(array, (v) => v * rndInt);
 
-                Console.WriteLine($"Second Task – [{string.Join(", ", array)}]");
+                Console.WriteLine($"Second Task (mul by {rndInt}) – [{string.Join(", ", array)}]");
                 return array;
-            }).ContinueWith(antecedent =>
+            });
+            secondTask.Wait();
+
+            var thirdTask = Task.Run(() =>
             {
-                var array = antecedent.Result;
+                var array = secondTask.Result;
                 Array.Sort(array);
 
                 Console.WriteLine($"Third Task – [{string.Join(", ", array)}]");
                 return array;
-            }).ContinueWith(antecedent =>
+            });
+            thirdTask.Wait();
+
+            var fourthTask = Task.Run(() =>
             {
-                var array = antecedent.Result;
+                var array = thirdTask.Result;
                 var avg = array.Average();
 
                 Console.WriteLine($"Fourth Task – {avg}");
             });
+            fourthTask.Wait();
 
             Console.ReadLine();
         }
