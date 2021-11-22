@@ -34,19 +34,13 @@ namespace MultiThreading.Task1._100Tasks
             for (int i = 0; i < TaskAmount; i++)
             {
                 var closure = i;
-                tasks[i] = new Task(() =>
+                tasks[i] = Task.Run(() =>
                 {
                     for (int j = 1; j <= MaxIterationsCount; j++)
                     {
                         Output(closure, j);
                     }
                 });
-            }
-
-            // runs them
-            foreach (var task in tasks)
-            {
-                task.Start();
             }
 
             // waits all of them are not finished
