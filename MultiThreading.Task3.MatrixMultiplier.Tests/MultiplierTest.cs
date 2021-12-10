@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MultiThreading.Task3.MatrixMultiplier.Matrices;
 using MultiThreading.Task3.MatrixMultiplier.Multipliers;
@@ -18,8 +19,33 @@ namespace MultiThreading.Task3.MatrixMultiplier.Tests
         [TestMethod]
         public void ParallelEfficiencyTest()
         {
-            // todo: implement a test method to check the size of the matrix which makes parallel multiplication more effective than
-            // todo: the regular one
+            var multiplier = new MatricesMultiplier();
+            var parallelMultiplier = new MatricesMultiplierParallel();
+
+            long regularTime = long.MinValue;
+            long parallelTime = long.MaxValue;
+            byte sizeOfMatrix = 0;
+
+            var stopwatch = new Stopwatch();
+
+            while (regularTime <= parallelTime && sizeOfMatrix < byte.MaxValue)
+            {
+                sizeOfMatrix++;
+                var firstMatrix = new Matrix(sizeOfMatrix, sizeOfMatrix, true);
+                var secondMatrix = new Matrix(sizeOfMatrix, sizeOfMatrix, true);
+
+                stopwatch.Restart();
+                multiplier.Multiply(firstMatrix, secondMatrix);
+                stopwatch.Stop();
+                regularTime = stopwatch.ElapsedTicks;
+
+                stopwatch.Restart();
+                parallelMultiplier.Multiply(firstMatrix, secondMatrix);
+                stopwatch.Stop();
+                parallelTime = stopwatch.ElapsedTicks;
+            }
+
+            Assert.IsTrue(true, $"Parallel multiplication becomes more efficient for sizes starting from {sizeOfMatrix}");
         }
 
         #region private methods
